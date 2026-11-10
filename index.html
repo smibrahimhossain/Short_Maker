@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Video Work Checklist</title>
+<style>
+:root{--bg:#f6f7fb;--card:#fff;--text:#1b1f2a;--muted:#6b7280;--line:#e5e7eb;--accent:#4f46e5;--done:#16a34a;--soft:#f1f2f8}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12141a;--card:#1c1f28;--text:#eef0f5;--muted:#9aa1b2;--line:#2c303c;--accent:#818cf8;--done:#4ade80;--soft:#242836}}
+:root[data-theme="dark"]{--bg:#12141a;--card:#1c1f28;--text:#eef0f5;--muted:#9aa1b2;--line:#2c303c;--accent:#818cf8;--done:#4ade80;--soft:#242836}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:"Hind Siliguri","Noto Sans Bengali",system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.55}
+.wrap{max-width:1100px;margin:0 auto;padding:20px 14px 40px}
+#list{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start}
+.col{min-width:0}
+@media (max-width:760px){#list{grid-template-columns:1fr;gap:0}}
+h1{font-size:1.4rem;margin:0 0 12px}
+input[type=text]{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--text);font-size:1rem;margin-bottom:14px}
+.bar{height:10px;background:var(--line);border-radius:99px;overflow:hidden}
+.fill{height:100%;width:0;background:var(--done);transition:width .25s}
+.count{display:flex;justify-content:space-between;color:var(--muted);font-size:.9rem;margin:6px 2px 14px}
+.item{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:8px;overflow:hidden}
+.item.done{border-color:var(--done)}
+.head{display:flex;align-items:center;gap:12px;padding:12px 14px}
+.head input{width:26px;height:26px;accent-color:var(--done);flex:none;cursor:pointer}
+.title{flex:1;display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;min-width:0}
+.num{flex:none;color:var(--accent);font-weight:700;min-width:26px}
+.txt{flex:1}
+.item.done .txt{text-decoration:line-through;color:var(--muted)}
+.arrow{flex:none;color:var(--muted);transition:transform .2s}
+.item.open .arrow{transform:rotate(90deg)}
+.body{display:none;padding:0 14px 14px 52px}
+.item.open .body{display:block}
+.detail{background:var(--soft);border-radius:10px;padding:12px;white-space:pre-wrap;font-size:.95rem}
+.copy{margin-top:8px;padding:8px 12px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--text);font-size:.9rem;cursor:pointer}
+.msg{text-align:center;color:var(--done);font-weight:700;margin-top:10px;min-height:1.4em}
+.row{display:flex;gap:8px;margin-top:10px}
+.row button{flex:1;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--text);font-size:1rem;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>✅ Video Work Checklist</h1>
+<input type="text" id="title" placeholder="Selected Title (ভিডিওর টাইটেল লিখুন)">
+<div class="bar"><div class="fill" id="fill"></div></div>
+<div class="count"><span id="c">0 / 14</span><span id="p">0%</span></div>
+<div id="list"></div>
+<div class="msg" id="msg"></div>
+<div class="row"><button id="toggleAll">📖 সব ডিটেলস খুলুন</button><button id="reset">🔄 নতুন ভিডিও (রিসেট)</button></div>
+</div>
+<script>
+var steps=[
+["টপিক সাজেস্ট করানো ও টাইটেল সিলেক্ট","আমি এই টপিকে ভিডিও বানাতে চাই, তুমি আমাকে কিছু টপিক সাজেস্ট করো।\nSelected Title : "],
+["Instagram কীওয়ার্ড নিয়ে ভিডিও খোঁজা","এই টপিকে ভিডিও বানাতে চাই, তুমি আমাকে কিছু কীওয়ার্ড দাও যাতে আমি ইনস্টাগ্রাম থেকে এই টাইপের ভিডিওগুলো ডাউনলোড করতে পারি।"],
+["ছবি থেকে টেক্সট PNG (একই ফন্ট ও কালার)","আমি তোমাকে যে ছবিটা দিয়েছি সেখান থেকে লেখাগুলো আসছে, লেখাগুলোকে তুমি আমাকে পিএনজি আকারে দাও আর লেখাগুলোকে যেরকম ফন্টে আছে, যেরকম কালার গ্রেডিং এ আছে, হুবহু সেম এরকম ভাবে দিবে। শুধু পিএনজি আকারে দিবে।"],
+["কালার গ্রেডিং চেঞ্জ ও টেক্সট PNG","এই ছবিটার কালার গ্রেডিংটা চেঞ্জ করে দাও আর টেক্সটটাকে পিএনজি আকারে দাও।"],
+["৬টি ভিডিও ডাউনলোড করে CapCut-এ যোগ","Instagram-এ সার্চ করে প্রায় ৬টি ভিডিও ডাউনলোড করুন। CapCut-এ ৬টি ভিডিও যোগ করুন (add in CapCut 6 video)।"],
+["৩:৪ ক্রপ, ভিডিও একটু নিচে নামানো","CapCut-এ ৩:৪ সাইজে ক্রপ করুন, ভিডিও একটু নিচে নামান যাতে উপরে টেক্সটের জায়গা থাকে, আর ভিডিওর মূল অংশ যেন দেখা যায়।"],
+["অপ্রয়োজনীয় অংশ কেটে ফেলা","অপ্রয়োজনীয় অংশ কেটে ফেলুন যাতে ভিডিও বোরিং না হয়।"],
+["নম্বর ও টেক্সট বসানো, ৫০% ব্লেন্ড, টাইটেল","CapCut-এ সংখ্যা ও টেক্সট আলাদা ক্রপ করে প্রতিটি ক্লিপে বসান। ক্লিপের শেষে ব্লেন্ড ইফেক্ট (প্রায় ৫০% ব্লেন্ড) দিন, টাইটেল অ্যাড দিন।"],
+["ভয়েসওভার (Adam ভয়েস, আমেরিকান ইংলিশ)","ভয়েসওভার: ChatGPT-কে দিয়ে বাংলা বাক্যকে আমেরিকানদের বোধগম্য ইংরেজিতে লিখিয়ে নিন (যেমন “Look at this cat”)। CapCut-এর Text to Voice-এ “Adam” ভয়েস দিয়ে ছোট ছোট ভয়েস বানান, প্রতিটি ভিডিওর সাথে ম্যাচ করে।"],
+["ভয়েস ভলিউম ১০০০, মূল সাউন্ড বাড়ানো","ভয়েসের ভলিউম ১০০০ করুন, আর Instagram থেকে নেওয়া মূল ভিডিওর সাউন্ডও বাড়ান কারণ সেটা কম থাকে।"],
+["অটো ক্যাপশন স্ক্রিনের মাঝখানে","ভিডিওর কথা অনুযায়ী অটো ক্যাপশন (টেক্সট) জেনারেট করে স্ক্রিনের মাঝামাঝি বসান।"],
+["ফানি সাউন্ড ইফেক্ট যোগ","ফানি সাউন্ড ইফেক্ট যোগ করুন।"],
+["পাবলিশ টাইম: বিকাল ৫টা – রাত ১টা (BD)","পাবলিশ করার সঠিক সময়: বিকাল ৫টা থেকে রাত ১টা (বাংলাদেশ সময়)"],
+["ক্যাটাগরি: Entertainment","ক্যাটাগরি: Entertainment।"]
+];
+var KEY="video-checklist-v2",state={title:"",done:[]},open={};
+try{var s=localStorage.getItem(KEY);if(s){var o=JSON.parse(s);if(o&&Array.isArray(o.done))state=o}}catch(e){}
+while(state.done.length<14)state.done.push(false);
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}}
+var list=document.getElementById("list");
+function render(){
+list.innerHTML="";
+var c0=document.createElement("div"),c1=document.createElement("div");c0.className="col";c1.className="col";
+list.appendChild(c0);list.appendChild(c1);
+steps.forEach(function(st,i){
+var d=document.createElement("div");d.className="item"+(state.done[i]?" done":"")+(open[i]?" open":"");
+var h=document.createElement("div");h.className="head";
+var cb=document.createElement("input");cb.type="checkbox";cb.checked=!!state.done[i];
+cb.onchange=function(){state.done[i]=cb.checked;save();render()};
+var t=document.createElement("div");t.className="title";
+t.onclick=function(){open[i]=!open[i];render()};
+t.innerHTML='<span class="num"></span><span class="txt"></span><span class="arrow">▶</span>';
+t.children[0].textContent=(i+1)+".";t.children[1].textContent=st[0];
+h.appendChild(cb);h.appendChild(t);d.appendChild(h);
+var b=document.createElement("div");b.className="body";
+var dt=document.createElement("div");dt.className="detail";dt.textContent=st[1];
+var cp=document.createElement("button");cp.className="copy";cp.textContent="📋 কপি";
+cp.onclick=function(){
+try{navigator.clipboard.writeText(st[1]).then(function(){cp.textContent="✔ কপি হয়েছে"},function(){cp.textContent="কপি করা যায়নি"})}catch(e){cp.textContent="কপি করা যায়নি"}};
+b.appendChild(dt);b.appendChild(cp);d.appendChild(b);(i<7?c0:c1).appendChild(d)});
+var c=state.done.filter(Boolean).length;
+document.getElementById("c").textContent=c+" / 14";
+document.getElementById("p").textContent=Math.round(c/14*100)+"%";
+document.getElementById("fill").style.width=(c/14*100)+"%";
+document.getElementById("msg").textContent=c===14?"🎉 সব কাজ শেষ!":"";
+var all=Object.keys(open).filter(function(k){return open[k]}).length===14;
+document.getElementById("toggleAll").textContent=all?"📕 সব ডিটেলস বন্ধ করুন":"📖 সব ডিটেলস খুলুন";
+}
+var ti=document.getElementById("title");ti.value=state.title||"";
+ti.oninput=function(){state.title=ti.value;save()};
+document.getElementById("toggleAll").onclick=function(){
+var all=Object.keys(open).filter(function(k){return open[k]}).length===14;
+for(var i=0;i<14;i++)open[i]=!all;render()};
+document.getElementById("reset").onclick=function(){
+if(confirm("সব টিক মুছে নতুন ভিডিও শুরু করবেন?")){state={title:"",done:new Array(14).fill(false)};ti.value="";save();render()}};
+render();
+</script>
+</body>
+</html>
